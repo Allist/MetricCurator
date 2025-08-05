@@ -12,7 +12,7 @@ spec:
         spec:
           containers:
           - name: reporter
-            image: ghcr.io/allist/metriccurator:main
+            image: ghcr.io/allist/metric-curator:main
             envFrom:
             - secretRef:
                 name: metric-curator-secret
