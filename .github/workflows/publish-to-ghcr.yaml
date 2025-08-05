@@ -1,0 +1,54 @@
+# 워크플로우의 이름
+name: Build and Publish Reporter to GHCR
+
+# 워크플로우를 실행할 시점(트리거) 정의
+on:
+  push:
+    branches:
+      - main  # 'main' 브랜치에 push가 발생했을 때만 실행
+
+# 워크플로우에 포함될 작업(job)들 정의
+jobs:
+  build-and-push:
+    # 작업을 실행할 가상 환경
+    runs-on: ubuntu-latest
+
+    # 작업에 필요한 권한 부여 (매우 중요!)
+    permissions:
+      contents: read      # 리포지토리 코드를 checkout 하기 위한 권한
+      packages: write    # GHCR에 패키지(Docker 이미지)를 쓰기 위한 권한
+
+    # 실제 작업 단계(steps) 정의
+    steps:
+      # 1. 코드 체크아웃
+      # 현재 리포지토리의 코드를 가상 환경으로 가져옵니다.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Docker 메타데이터 추출 (태그, 레이블 등)
+      # Git 정보를 기반으로 이미지 태그를 자동으로 생성해줍니다.
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }} # 이미지 이름: ghcr.io/사용자명/리포지토리명
+
+      # 3. GHCR에 로그인
+      # GITHUB_TOKEN을 사용하여 별도의 암호 없이 안전하게 로그인합니다.
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }} # 작업을 실행하는 사용자
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 4. Docker 이미지 빌드 및 GHCR에 푸시
+      # Dockerfile을 사용하여 이미지를 빌드하고, 로그인된 GHCR로 푸시합니다.
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }} # 2단계에서 생성된 태그 사용
+          labels: ${{ steps.meta.outputs.labels }} # 2단계에서 생성된 레이블 사용
+
