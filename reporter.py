@@ -19,7 +19,7 @@ from prometheus_api_client.exceptions import PrometheusApiClientException
 # (Kubernetes에서는 Secret을 사용하여 관리합니다)
 
 # Prometheus 서버의 내부 서비스 주소
-PROMETHEUS_URL = os.environ.get("PROMETHEUS_URL", "http://prometheus-k8s.monitoring.svc.cluster.local:9090")
+PROMETHEUS_URL = os.environ.get("PROMETHEUS_URL")
 
 # Discord 웹훅 URL
 DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
