@@ -156,7 +156,7 @@ def generate_report_with_gemini(metrics_text):
         return "메트릭 데이터를 수집하지 못해 리포트를 생성할 수 없습니다."
         
     try:
-        model = genai.GenerativeModel('gemini-1.5-pro-latest')
+        model = genai.GenerativeModel('gemini-2.5-pro')
         
         prompt = f"""
         당신은 쿠버네티스 홈서버 클러스터를 관리하는 시스템 관리 전문가입니다.

@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-server-reporter
+  namespace: monitoring
+spec:
+  # 매일 오전 0시에 실행 (UTC 기준일 수 있으니 확인 필요)
+  schedule: "0 0 * * *" 
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: reporter
+            image: ghcr.io/allist/metriccurator:main
+            envFrom:
+            - secretRef:
+                name: metric-curator-secret
+            - configMapRef:
+                name: metric-curator-configmap
+          restartPolicy: OnFailure
+
